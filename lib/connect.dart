@@ -66,6 +66,10 @@ class _connectState extends State<connect> {
             controller: controller,
             minLines: 30,
             maxLines: 80,
+            onChanged:(val){
+              //saveload.saveGeneral('notes',val);
+
+            } ,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               labelText: '...',
