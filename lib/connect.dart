@@ -24,6 +24,7 @@ class _connectState extends State<connect> {
   late DateTime _focusedDay;
   DateTime? _selectedDay;
   late Future<Map<String, dynamic>?> load;
+  final databaseReference2 = FirebaseDatabase.instance.reference();
 
   @override
   void initState() {
@@ -31,14 +32,21 @@ class _connectState extends State<connect> {
     controller = TextEditingController();
     controller2 = TextEditingController();
     _focusedDay = DateTime.now();
+    listenToHomeNotes(homeId);
+  }
+
+  Future<String> listenToHomeNotes(String homeId) async {
+    databaseReference2.child(homeId).onValue.listen((event) {
+      // Update the text field whenever the value in the database changes
+      controller.text = event.snapshot.child('notes').toString();
+    });
+    return ''; // Return an empty string or null as the future result
   }
 
   Widget calendarApp() {
     return TableCalendar(
       calendarStyle: CalendarStyle(
-        selectedDecoration: BoxDecoration(
-          color: Colors.green
-        ),
+        selectedDecoration: BoxDecoration(color: Colors.green),
       ),
       calendarFormat: CalendarFormat.month,
       firstDay: DateTime.utc(2023, 01, 01),
@@ -47,7 +55,6 @@ class _connectState extends State<connect> {
       selectedDayPredicate: (day) {
         return isSameDay(_selectedDay, day);
       },
-
       onDaySelected: (selectedDay, focusedDay) {
         setState(() {
           _selectedDay = selectedDay;
@@ -70,6 +77,7 @@ class _connectState extends State<connect> {
           return Text('Error: ${snapshot.error}');
         } else {
           String? loadedText = snapshot.data;
+          controller.text = loadedText!;
           return SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -84,7 +92,7 @@ class _connectState extends State<connect> {
                   maxLines: 80,
                   onChanged: (val) {
                     // Save the text whenever it changes
-                    saveLoad().writeToHomeNotes(val,homeId);
+                    saveLoad().writeToHomeNotes(val, homeId);
                   },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
@@ -169,4 +177,3 @@ class _connectState extends State<connect> {
     );
   }
 }
-
