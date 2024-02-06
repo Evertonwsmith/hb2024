@@ -15,6 +15,7 @@ class connect extends StatefulWidget {
 
 class _connectState extends State<connect> {
   String homeId = "homeId";
+  bool change = false;
   late String homeNote;
   late TextEditingController controller;
   late TextEditingController controller2;
@@ -35,10 +36,24 @@ class _connectState extends State<connect> {
     listenToHomeNotes(homeId);
   }
 
+  @override
+  void dispose() {
+    controller.dispose();
+    controller2.dispose();
+    super.dispose();
+  }
+
   Future<String> listenToHomeNotes(String homeId) async {
-    databaseReference2.child(homeId).onValue.listen((event) {
+    databaseReference2
+        .child('homes')
+        .child(homeId)
+        .child('notes')
+        .onValue
+        .listen((event) {
       // Update the text field whenever the value in the database changes
-      controller.text = event.snapshot.child('notes').toString();
+      setState(() {
+        controller.text = event.snapshot.child('notes').value.toString();
+      });
     });
     return ''; // Return an empty string or null as the future result
   }
@@ -82,23 +97,42 @@ class _connectState extends State<connect> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                SizedBox(height: 20),
                 Text(
                   'Notepad',
                   style: Theme.of(context).textTheme.headline4,
                 ),
+                SizedBox(height: 20),
+                IconButton(
+                    onPressed: () {
+                      saveLoad().writeToHomeNotes(controller.text, homeId);
+                      if (change == true) {
+                        setState(() {
+                          change = false;
+                        });
+                      }
+                    },
+                    icon: Icon(Icons.save_outlined,
+                        size: 50,
+                        color: change ? Colors.greenAccent : Colors.black)),
                 TextField(
                   controller: controller,
                   minLines: 30,
                   maxLines: 80,
-                  onChanged: (val) {
-                    // Save the text whenever it changes
-                    saveLoad().writeToHomeNotes(val, homeId);
+                  onTap: () {
+                    if (change == false) {
+                      setState(() {
+                        change = true;
+                      });
+                    }
                   },
+                  // onEditingComplete: () {
+                  //   // Save the text whenever the editing is complete
+                  //   saveLoad().writeToHomeNotes(controller.text, homeId);
+                  // },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Note',
-                    // Load the text from Firebase
-                    hintText: loadedText ?? 'No text loaded',
                   ),
                 ),
               ],
