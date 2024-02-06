@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_storage: ^11.6.0
   firebase_core: ^2.24.2
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:
