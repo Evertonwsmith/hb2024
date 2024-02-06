@@ -84,7 +84,7 @@ class _connectState extends State<connect> {
                   maxLines: 80,
                   onChanged: (val) {
                     // Save the text whenever it changes
-                    saveLoad().writeToHomeNotes(val);
+                    saveLoad().writeToHomeNotes(val,homeId);
                   },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),

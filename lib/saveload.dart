@@ -32,8 +32,8 @@ class saveLoad {
     return null;
   }
 
-  void writeToHomeNotes(String notes) {
-    databaseReference2.child('homeId').set({'notes': notes});
+  void writeToHomeNotes(String notes, String homeId) {
+    databaseReference2.child('homes').child(homeId).set({'notes': notes});
   }
   Future<String> readFromHomeNotes(homeId) async {
     String ret = '';
@@ -51,6 +51,6 @@ class saveLoad {
 
   Future<String> listenToHomeNotes(String homeId) async {
     databaseReference2.child(homeId).onValue.listen((event) {});
-    return databaseReference2.child('homeId').child('notes').toString();
+    return databaseReference2.child('homes').child(homeId).child('notes').toString();
   }
 }
