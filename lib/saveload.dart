@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-// import 'package:uxexplore/firebase_options.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 
 class saveLoad {
   Future<void> generalSave(
       String collection, String document, Map<String, dynamic> data) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
+    print('generalSave');
     QuerySnapshot ref = await firestore.collection(collection).get();
     DocumentReference newRef = firestore.collection(collection).doc(document);
     await newRef.set(data);

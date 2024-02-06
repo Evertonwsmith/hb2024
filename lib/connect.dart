@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:homebase/saveload.dart';
 
 class connect extends StatefulWidget {
   const connect({Key? key}) : super(key: key);
@@ -10,6 +11,7 @@ class connect extends StatefulWidget {
 }
 
 class _connectState extends State<connect> {
+  String homeId = "homeId";
   late TextEditingController controller;
   late TextEditingController controller2;
 
@@ -67,7 +69,8 @@ class _connectState extends State<connect> {
             minLines: 30,
             maxLines: 80,
             onChanged:(val){
-              //saveload.saveGeneral('notes',val);
+              saveLoad().generalSave('homes', homeId, {'note' : val});
+              // saveload().saveGeneral('notes',val);
 
             } ,
             decoration: const InputDecoration(
