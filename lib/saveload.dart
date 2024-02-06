@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class saveLoad {
+  final databaseReference2 = FirebaseDatabase.instance.reference();
   Future<void> generalSave(
       String collection, String document, Map<String, dynamic> data) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -26,5 +30,27 @@ class saveLoad {
 
     // Return null if the document does not exist
     return null;
-  }}
+  }
 
+  void writeToHomeNotes(String notes) {
+    databaseReference2.child('homeId').set({'notes': notes});
+  }
+  Future<String> readFromHomeNotes(homeId) async {
+    String ret = '';
+
+    var databaseReference = FirebaseDatabase.instance.reference().child('homes').child(homeId).child('notes');
+
+    // Get the data snapshot asynchronously
+    DatabaseEvent dbEvent = await databaseReference.once();
+    if(dbEvent.snapshot != null){
+      ret = dbEvent.snapshot.value.toString();
+    }
+    return ret;
+  }
+
+
+  Future<String> listenToHomeNotes(String homeId) async {
+    databaseReference2.child(homeId).onValue.listen((event) {});
+    return databaseReference2.child('homeId').child('notes').toString();
+  }
+}

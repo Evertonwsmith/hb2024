@@ -1,3 +1,6 @@
+import 'dart:js_interop';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -12,6 +15,7 @@ class connect extends StatefulWidget {
 
 class _connectState extends State<connect> {
   String homeId = "homeId";
+  late String homeNote;
   late TextEditingController controller;
   late TextEditingController controller2;
 
@@ -19,6 +23,7 @@ class _connectState extends State<connect> {
 
   late DateTime _focusedDay;
   DateTime? _selectedDay;
+  late Future<Map<String, dynamic>?> load;
 
   @override
   void initState() {
@@ -56,30 +61,43 @@ class _connectState extends State<connect> {
   }
 
   Widget notepadApp() {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            'Notepad',
-            style: Theme.of(context).textTheme.headline4,
-          ),
-          TextField(
-            controller: controller,
-            minLines: 30,
-            maxLines: 80,
-            onChanged:(val){
-              saveLoad().generalSave('homes', homeId, {'note' : val});
-              // saveload().saveGeneral('notes',val);
-
-            } ,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: '...',
+    return FutureBuilder<String>(
+      future: saveLoad().readFromHomeNotes(homeId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          String? loadedText = snapshot.data;
+          return SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'Notepad',
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+                TextField(
+                  controller: controller,
+                  minLines: 30,
+                  maxLines: 80,
+                  onChanged: (val) {
+                    // Save the text whenever it changes
+                    saveLoad().writeToHomeNotes(val);
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Note',
+                    // Load the text from Firebase
+                    hintText: loadedText ?? 'No text loaded',
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
 
@@ -151,3 +169,4 @@ class _connectState extends State<connect> {
     );
   }
 }
+
